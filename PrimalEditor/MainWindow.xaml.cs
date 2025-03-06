@@ -9,7 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using System.ComponentModel;
 namespace PrimalEditor;
 
 /// <summary>
@@ -21,6 +21,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Loaded += OnMainWindowLoaded;
+        Closing += OnMainWindowClosing;
     }
 
     private void OnMainWindowLoaded(object sender, RoutedEventArgs e)
@@ -29,16 +30,24 @@ public partial class MainWindow : Window
         OpenProjectBrowserDialog();
     }
 
+    private void OnMainWindowClosing(object sender, CancelEventArgs e)
+    {
+        Closing -= OnMainWindowClosing;
+        Project.Current?.Unload();
+    }
+
     private void OpenProjectBrowserDialog()
     {
         var projectBrowser = new ProjectBrowserDialog();
-        if ( projectBrowser.ShowDialog() == false )
+        projectBrowser.Topmost = true;
+        if ( projectBrowser.ShowDialog() == false || projectBrowser.DataContext == null )
         {
             Application.Current.Shutdown();
         }
         else
         {
-
+            Project.Current?.Unload();
+            DataContext = projectBrowser.DataContext;
         }
     }
 }
