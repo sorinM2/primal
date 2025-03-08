@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace PrimalEditor.Components
 {
+
+    public interface IMSComponent { }
     [DataContract]
-    public class Component : ViewModelBase
+    abstract public class Component : ViewModelBase
     {
         [DataMember]
         public GameEntity Owner
@@ -22,5 +24,10 @@ namespace PrimalEditor.Components
             Debug.Assert(owner != null);
             Owner = owner;
         }
+    }
+
+    public abstract class MSComponent<T> : ViewModelBase, IMSComponent where T : Component
+    {
+
     }
 }

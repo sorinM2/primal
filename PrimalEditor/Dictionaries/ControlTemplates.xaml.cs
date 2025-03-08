@@ -12,7 +12,7 @@ namespace PrimalEditor.Dictionaries
 {
     public partial class ControlTemplates: ResourceDictionary
     {
-        private void OnTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void OnTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             var textBox = sender as TextBox;
             var exp = textBox.GetBindingExpression(TextBox.TextProperty);
