@@ -22,8 +22,19 @@ namespace PrimalEditor.GameProject
         public ProjectBrowserDialog()
         {
             InitializeComponent();
+            Loaded += OnProjectBrowserOpened;
         }
 
+        private void OnProjectBrowserOpened(object sender, RoutedEventArgs e)
+        {
+            Loaded -= OnProjectBrowserOpened;
+            if (!OpenProject.Projects.Any())
+            {
+                openProjectButton.IsEnabled = false;
+                openProjectView.Visibility = Visibility.Hidden;
+                OnToggleButton_Click(createProjectButton, new RoutedEventArgs());
+            }
+        }
         private void OnToggleButton_Click(object sender, RoutedEventArgs e)
         {
             if ( sender == openProjectButton )

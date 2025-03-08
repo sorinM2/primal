@@ -36,6 +36,7 @@ namespace PrimalEditor.GameProject
             {
                 dialogResult = true;
                 var Project = OpenProject.Open(new ProjectData() { ProjectName = vm.ProjectName, ProjectPath = projectPath });
+                win.DataContext = Project;
             }
             win.DialogResult = dialogResult;
             win.Close();

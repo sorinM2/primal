@@ -26,6 +26,7 @@ public partial class MainWindow : Window
 
     private void OnMainWindowLoaded(object sender, RoutedEventArgs e)
     {
+        Hide();
         Loaded -= OnMainWindowLoaded;
         OpenProjectBrowserDialog();
     }
@@ -39,13 +40,13 @@ public partial class MainWindow : Window
     private void OpenProjectBrowserDialog()
     {
         var projectBrowser = new ProjectBrowserDialog();
-        projectBrowser.Topmost = true;
         if ( projectBrowser.ShowDialog() == false || projectBrowser.DataContext == null )
         {
             Application.Current.Shutdown();
         }
         else
         {
+            Show();
             Project.Current?.Unload();
             DataContext = projectBrowser.DataContext;
         }
