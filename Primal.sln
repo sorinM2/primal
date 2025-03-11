@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrimalEditor", "PrimalEdito
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcxproj", "{9B16A70F-2AB6-477D-89B3-35838A6F26D9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EngineTest", "EngineTest\EngineTest.vcxproj", "{9152181A-3BA1-40DD-B29F-054407D40754}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EngineDll", "EngineDll\EngineDll.vcxproj", "{55FF4609-4E82-4ED6-923D-73AEA7BA3061}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +25,14 @@ Global
 		{9B16A70F-2AB6-477D-89B3-35838A6F26D9}.Debug|x64.Build.0 = Debug|x64
 		{9B16A70F-2AB6-477D-89B3-35838A6F26D9}.Release|x64.ActiveCfg = Release|x64
 		{9B16A70F-2AB6-477D-89B3-35838A6F26D9}.Release|x64.Build.0 = Release|x64
+		{9152181A-3BA1-40DD-B29F-054407D40754}.Debug|x64.ActiveCfg = Debug|x64
+		{9152181A-3BA1-40DD-B29F-054407D40754}.Debug|x64.Build.0 = Debug|x64
+		{9152181A-3BA1-40DD-B29F-054407D40754}.Release|x64.ActiveCfg = Release|x64
+		{9152181A-3BA1-40DD-B29F-054407D40754}.Release|x64.Build.0 = Release|x64
+		{55FF4609-4E82-4ED6-923D-73AEA7BA3061}.Debug|x64.ActiveCfg = Debug|x64
+		{55FF4609-4E82-4ED6-923D-73AEA7BA3061}.Debug|x64.Build.0 = Debug|x64
+		{55FF4609-4E82-4ED6-923D-73AEA7BA3061}.Release|x64.ActiveCfg = Release|x64
+		{55FF4609-4E82-4ED6-923D-73AEA7BA3061}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

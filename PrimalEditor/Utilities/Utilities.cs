@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace PrimalEditor.Utilities
 {
+
+    public static class ID
+    {
+        public static int INVALID_ID => -1;
+        public static bool IsValid(int id) { return id != INVALID_ID; }
+    }
     static class MathUtil
     {
         public static float Epsilon => 0.000001f;
