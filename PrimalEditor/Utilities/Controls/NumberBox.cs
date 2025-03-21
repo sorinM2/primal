@@ -59,6 +59,7 @@ namespace PrimalEditor.Utilities.Controls
 
             _multiplier = .01d;
             _mouseXStart = e.GetPosition(this).X;
+            Focus();
         }
         private void OnTextBlock_Mouse_LBU(object sender, MouseButtonEventArgs e)
         {

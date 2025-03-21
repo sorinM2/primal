@@ -13,6 +13,7 @@ namespace PrimalEditor.Components
     [DataContract]
     abstract public class Component : ViewModelBase
     {
+        public abstract IMSComponent GetMultiselectionComponent(MSEntity msEntity);
         [DataMember]
         public GameEntity Owner
         {
@@ -28,6 +29,23 @@ namespace PrimalEditor.Components
 
     public abstract class MSComponent<T> : ViewModelBase, IMSComponent where T : Component
     {
+        private bool _enableUpdates;
+        public List<T> SelectedComponents { get; }
 
+        protected abstract bool UpdateComponents(string propertyName);
+
+        protected abstract bool UpdateMSComponent();
+        public void Refresh()
+        {
+            _enableUpdates = false;
+            UpdateMSComponent();
+            _enableUpdates = true;
+        }
+        public MSComponent(MSEntity mSEntity)
+        {
+            Debug.Assert(mSEntity?.SelectedEntities?.Any() == true);
+            SelectedComponents = mSEntity.SelectedEntities.Select(entity => entity.GetComponent<T>()).ToList();
+            PropertyChanged += (s, e) => { if (_enableUpdates) UpdateComponents(e.PropertyName); };
+        }
     }
 }
