@@ -52,10 +52,10 @@ private:
 		while (count > 0)
 		{
 			++_added;
-			game_entity::entity entity{ game_entity::create_game_entity(entity_info) };
+			game_entity::entity entity{ game_entity::create(entity_info) };
 			assert(entity.is_valid() && id::is_valid(entity.get_id()));
 			_entities.push_back(entity);
-			assert(game_entity::is_alive(entity));
+			assert(game_entity::is_alive(entity.get_id()));
 			--count;
 		}
 	}
@@ -69,14 +69,14 @@ private:
 		{
 			const u32 index{ (u32)rand() % (u32)_entities.size() };
 			game_entity::entity entity{ _entities[index]};
-			if (!game_entity::is_alive(entity) && id::is_valid(entity.get_id()))	continue;
+			if (!game_entity::is_alive(entity.get_id()) && id::is_valid(entity.get_id()))	continue;
 			assert(entity.is_valid());
 
 			if (entity.is_valid())
 			{
-				game_entity::remove_game_entity(entity);
+				game_entity::remove(entity.get_id());
 				_entities.erase(_entities.begin() + index);
-				assert(!game_entity::is_alive(entity));
+				assert(!game_entity::is_alive(entity.get_id()));
 				_removed++;
 			}
 			--count;

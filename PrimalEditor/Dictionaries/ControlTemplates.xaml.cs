@@ -67,10 +67,10 @@ namespace PrimalEditor.Dictionaries
         {
             var textBox = sender as TextBox;
             var exp = textBox.GetBindingExpression(TextBox.TextProperty);
+            if (!textBox.IsVisible) return;
             if ( exp != null )
             {
                 exp.UpdateTarget();
-                textBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Previous));
                 textBox.Visibility = Visibility.Collapsed;
             }
         }
