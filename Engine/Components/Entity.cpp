@@ -34,6 +34,7 @@ namespace primal::game_entity
 			generations.push_back(0);
 
 			transforms.emplace_back();
+			scripts.emplace_back();
 		}
 
 		const entity new_entity{ id };
@@ -59,6 +60,11 @@ namespace primal::game_entity
 		const id::id_type index{ id::index(id) };
 		assert(is_alive(id));
 
+		if (scripts[index].is_valid())
+		{
+			script::remove(scripts[index]);
+			scripts[index] = {};
+		}
 		transform::remove(transforms[index]);
 		transforms[index] = {};
 		free_ids.push_back(id);

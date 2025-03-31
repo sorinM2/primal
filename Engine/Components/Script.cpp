@@ -8,12 +8,12 @@ namespace primal::script
 		utl::vector<id::generation_type>	generations;
 		std::vector<script_id>				free_ids;
 
-		using script_registery = std::unordered_map<size_t, detail::script_creator>;
+		using script_registry = std::unordered_map<size_t, detail::script_creator>;
 
-		script_registery reg;
-		script_registery& registery()
+		script_registry reg;
+		script_registry& registery()
 		{
-			static script_registery reg;
+			static script_registry reg;
 			return reg;
 		}
 		bool exists(script_id id)
@@ -32,7 +32,7 @@ namespace primal::script
 	{
 		u8 register_script(size_t tag, script_creator func)
 		{
-			bool result{ registery().insert(script_registery::value_type{tag, func}).second};
+			bool result{ registery().insert(script_registry::value_type{tag, func}).second};
 			assert(result);
 			return result;
 		}
@@ -62,7 +62,7 @@ namespace primal::script
 		assert(id::is_valid(id));
 		entity_scripts.emplace_back(info.script_creator(entity));
 		assert(entity_scripts.back()->get_id() == entity.get_id());
-		const id::id_type index{ (id::id_type)entity_scripts.size() };
+		const id::id_type index{ (id::id_type)entity_scripts.size() - 1};
 		id_mapping[id::index(id)] = index;
 		return component{ id };
 	}

@@ -8,8 +8,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.ComponentModel;
+using System.IO;
+
 namespace PrimalEditor;
 
 /// <summary>
@@ -17,6 +18,7 @@ namespace PrimalEditor;
 /// </summary>
 public partial class MainWindow : Window
 {
+    public static string PrimalPath { get; private set; } = @"c:\dev\Primal";
     public MainWindow()
     {
         InitializeComponent();
@@ -28,7 +30,30 @@ public partial class MainWindow : Window
     {
         Hide();
         Loaded -= OnMainWindowLoaded;
+        GetEnginePath();
         OpenProjectBrowserDialog();
+    }
+
+    private void GetEnginePath()
+    {
+        var enginePath = Environment.GetEnvironmentVariable("PRIMAL_ENGINE", EnvironmentVariableTarget.User);
+        if ( enginePath == null|| !Directory.Exists(Path.Combine(enginePath, @"Engine\EngineAPI")))
+        {
+            var dlg = new EnginePathDialog();
+            if ( dlg.ShowDialog() == true)
+            {
+                PrimalPath = dlg.PrimalPath;
+                Environment.SetEnvironmentVariable("PRIMAL_ENGINE", PrimalPath.ToUpper(), EnvironmentVariableTarget.User);
+            }
+            else
+            {
+                Application.Current.Shutdown();
+            }
+        }
+        else
+        {
+            PrimalPath = enginePath;
+        }
     }
 
     private void OnMainWindowClosing(object sender, CancelEventArgs e)
