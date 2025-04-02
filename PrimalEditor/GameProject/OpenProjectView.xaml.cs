@@ -1,8 +1,8 @@
-﻿using System;
+﻿// Copyright (c) Arash Khatami
+// Distributed under the MIT license. See the LICENSE file in the project root for more information.
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -37,15 +37,16 @@ namespace PrimalEditor.GameProject
             OpenSelectedProject();
         }
 
-        private void OnListBoxItem_Mouse_DoubleClick(object sender, RoutedEventArgs e)
+        private void OnListBoxItem_Mouse_DoubleClick(object sender, MouseButtonEventArgs e)
         {
             OpenSelectedProject();
         }
+
         private void OpenSelectedProject()
         {
             var project = OpenProject.Open(projectsListBox.SelectedItem as ProjectData);
-            var win = Window.GetWindow(this);
             bool dialogResult = false;
+            var win = Window.GetWindow(this);
             if (project != null)
             {
                 dialogResult = true;

@@ -1,82 +1,74 @@
-﻿using System;
+﻿using PrimalEditor.Utilities;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Threading.Tasks;
-using PrimalEditor.Utilities;
 
 namespace PrimalEditor.Components
 {
     [DataContract]
-    public class Transform : Component
+    class Transform : Component
     {
         private Vector3 _position;
-
         [DataMember]
         public Vector3 Position
         {
             get => _position;
             set
             {
-                if ( _position != value )
+                if (_position != value)
                 {
                     _position = value;
                     OnPropertyChanged(nameof(Position));
                 }
             }
         }
-        private Vector3 _rotation;
 
+        private Vector3 _rotation;
         [DataMember]
         public Vector3 Rotation
         {
             get => _rotation;
             set
             {
-                if ( _rotation != value )
+                if (_rotation != value)
                 {
                     _rotation = value;
                     OnPropertyChanged(nameof(Rotation));
                 }
             }
         }
-        private Vector3 _scale;
 
+        private Vector3 _scale;
         [DataMember]
         public Vector3 Scale
         {
             get => _scale;
             set
             {
-                if ( _scale != value )
+                if (_scale != value)
                 {
                     _scale = value;
                     OnPropertyChanged(nameof(Scale));
                 }
             }
         }
-        public Transform(GameEntity owner) : base(owner)
-        {
-        }
 
-        public override IMSComponent GetMultiselectionComponent(MSEntity msEntity)
-        {
-            return new MSTransform(msEntity);
-        }
+        public override IMSComponent GetMultiselectionComponent(MSEntity msEntity) => new MSTransform(msEntity);
+
+        public Transform(GameEntity owner) : base(owner) { }
     }
 
-    public sealed class MSTransform : MSComponent<Transform>
+    sealed class MSTransform : MSComponent<Transform>
     {
         private float? _posX;
-
         public float? PosX
         {
             get => _posX;
             set
             {
-                if ( !_posX.IsTheSameAs(value))
+                if (!_posX.IsTheSameAs(value))
                 {
                     _posX = value;
                     OnPropertyChanged(nameof(PosX));
@@ -195,15 +187,18 @@ namespace PrimalEditor.Components
                 }
             }
         }
+
+
         protected override bool UpdateComponents(string propertyName)
         {
-            switch(propertyName)
+            switch (propertyName)
             {
                 case nameof(PosX):
                 case nameof(PosY):
                 case nameof(PosZ):
                     SelectedComponents.ForEach(c => c.Position = new Vector3(_posX ?? c.Position.X, _posY ?? c.Position.Y, _posZ ?? c.Position.Z));
                     return true;
+
                 case nameof(RotX):
                 case nameof(RotY):
                 case nameof(RotZ):
@@ -215,6 +210,7 @@ namespace PrimalEditor.Components
                 case nameof(ScaleZ):
                     SelectedComponents.ForEach(c => c.Scale = new Vector3(_scaleX ?? c.Scale.X, _scaleY ?? c.Scale.Y, _scaleZ ?? c.Scale.Z));
                     return true;
+
             }
             return false;
         }

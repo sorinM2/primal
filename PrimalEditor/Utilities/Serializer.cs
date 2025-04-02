@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace PrimalEditor.Utilities
 {
@@ -19,14 +17,15 @@ namespace PrimalEditor.Utilities
                 var serializer = new DataContractSerializer(typeof(T));
                 serializer.WriteObject(fs, instance);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
+                Debug.WriteLine(ex.Message);
                 Logger.Log(MessageType.Error, $"Failed to serialize {instance} to {path}");
                 throw;
             }
         }
 
-        public static T FromFile<T>(string path)
+        internal static T FromFile<T>(string path)
         {
             try
             {
@@ -37,6 +36,7 @@ namespace PrimalEditor.Utilities
             }
             catch (Exception ex)
             {
+                Debug.WriteLine(ex.Message);
                 Logger.Log(MessageType.Error, $"Failed to deserialize {path}");
                 throw;
             }

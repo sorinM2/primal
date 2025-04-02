@@ -1,10 +1,9 @@
-﻿using PrimalEditor.GameProject;
+﻿using PrimalEditor.GameDev;
+using PrimalEditor.GameProject;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -28,10 +27,15 @@ namespace PrimalEditor.Editors
             Loaded += OnWorldEditorViewLoaded;
         }
 
-        public void OnWorldEditorViewLoaded(object sender, RoutedEventArgs e)
+        private void OnWorldEditorViewLoaded(object sender, RoutedEventArgs e)
         {
             Loaded -= OnWorldEditorViewLoaded;
             Focus();
+        }
+
+        private void OnNewScript_Button_Click(object sender, RoutedEventArgs e)
+        {
+            new NewScriptDialog().ShowDialog();
         }
     }
 }

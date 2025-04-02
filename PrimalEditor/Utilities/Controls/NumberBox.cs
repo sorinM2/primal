@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -27,7 +25,8 @@ namespace PrimalEditor.Utilities.Controls
 
         public static readonly DependencyProperty MultiplierProperty =
             DependencyProperty.Register(nameof(Multiplier), typeof(double), typeof(NumberBox),
-                                        new PropertyMetadata(1.0));
+                new PropertyMetadata(1.0));
+
         public string Value
         {
             get => (string)GetValue(ValueProperty);
@@ -36,12 +35,13 @@ namespace PrimalEditor.Utilities.Controls
 
         public static readonly DependencyProperty ValueProperty =
             DependencyProperty.Register(nameof(Value), typeof(string), typeof(NumberBox),
-                                        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            if ( GetTemplateChild("PART_textBlock") is TextBlock textBlock )
+
+            if(GetTemplateChild("PART_textBlock") is TextBlock textBlock)
             {
                 textBlock.MouseLeftButtonDown += OnTextBlock_Mouse_LBD;
                 textBlock.MouseLeftButtonUp += OnTextBlock_Mouse_LBU;
@@ -52,23 +52,23 @@ namespace PrimalEditor.Utilities.Controls
         private void OnTextBlock_Mouse_LBD(object sender, MouseButtonEventArgs e)
         {
             double.TryParse(Value, out _originalValue);
+
             Mouse.Capture(sender as UIElement);
             _captured = true;
             _valueChanged = false;
             e.Handled = true;
-
-            _multiplier = .01d;
             _mouseXStart = e.GetPosition(this).X;
             Focus();
         }
+
         private void OnTextBlock_Mouse_LBU(object sender, MouseButtonEventArgs e)
         {
-            if ( _captured )
+            if(_captured)
             {
                 Mouse.Capture(null);
                 _captured = false;
                 e.Handled = true;
-                if ( !_valueChanged && GetTemplateChild("PART_textBox") is TextBox textBox)
+                if(!_valueChanged && GetTemplateChild("PART_textBox") is TextBox textBox)
                 {
                     textBox.Visibility = Visibility.Visible;
                     textBox.Focus();
@@ -76,29 +76,30 @@ namespace PrimalEditor.Utilities.Controls
                 }
             }
         }
+
         private void OnTextBlock_Mouse_Move(object sender, MouseEventArgs e)
         {
-            if ( _captured )
+            if(_captured)
             {
                 var mouseX = e.GetPosition(this).X;
                 var d = mouseX - _mouseXStart;
-                if ( Math.Abs(d) > SystemParameters.MinimumHorizontalDragDistance )
+                if(Math.Abs(d) > SystemParameters.MinimumHorizontalDragDistance)
                 {
-                    if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
-                        _multiplier = .0001d;
-                    else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
-                        _multiplier = .1d;
-                    else _multiplier = .01d;
-                        var newValue = _originalValue + (d * _multiplier * Multiplier);
-                    Value = newValue.ToString("0.######");
+                    if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control)) _multiplier = 0.001;
+                    else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)) _multiplier = 0.1;
+                    else _multiplier = 0.01;
+
+                    var newValue = _originalValue + (d * _multiplier * Multiplier);
+                    Value = newValue.ToString("0.#####");
                     _valueChanged = true;
                 }
             }
         }
-        static  NumberBox()
+
+        static NumberBox()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(NumberBox),
-                                                    new FrameworkPropertyMetadata(typeof(NumberBox)));
+                new FrameworkPropertyMetadata(typeof(NumberBox)));
         }
     }
 }

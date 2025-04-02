@@ -10,11 +10,10 @@
         <ItemsControl ItemsSource="{Binding UndoList}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <StackPanel/>
+                    <StackPanel />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-                
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}" Foreground="{StaticResource Editor.FontBrush}"/>
                 </DataTemplate>
@@ -23,11 +22,10 @@
         <ItemsControl ItemsSource="{Binding RedoList}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <StackPanel/>
+                    <StackPanel />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-                
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}" Foreground="{StaticResource Editor.Disabled.FontBrush}"/>
                 </DataTemplate>

@@ -1,16 +1,16 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace PrimalEditor.Utilities
 {
     public interface IUndoRedo
     {
-        string Name { get;}
+        string Name { get; }
         void Undo();
         void Redo();
     }
@@ -21,7 +21,9 @@ namespace PrimalEditor.Utilities
         private Action _redoAction;
 
         public string Name { get; }
+
         public void Redo() => _redoAction();
+
         public void Undo() => _undoAction();
 
         public UndoRedoAction(string name)
@@ -29,29 +31,28 @@ namespace PrimalEditor.Utilities
             Name = name;
         }
 
-        public UndoRedoAction(Action undoAction, Action redoAction, string name)
-            :this(name)
+        public UndoRedoAction(Action undo, Action redo, string name)
+            : this(name)
         {
-            Debug.Assert(undoAction != null && redoAction != null);
-            _undoAction = undoAction;
-            _redoAction = redoAction;
+            Debug.Assert(undo != null && redo != null);
+            _undoAction = undo;
+            _redoAction = redo;
         }
 
-        public UndoRedoAction(string property, object instance, object undoValue, object redoValue, string name):
+        public UndoRedoAction(string property, object instance, object undoValue, object redoValue, string name) :
             this(
                 () => instance.GetType().GetProperty(property).SetValue(instance, undoValue),
                 () => instance.GetType().GetProperty(property).SetValue(instance, redoValue),
-                name
-                )
-        {}
+                name)
+        { }
 
     }
+
     public class UndoRedo
     {
         private bool _enableAdd = true;
         private readonly ObservableCollection<IUndoRedo> _redoList = new ObservableCollection<IUndoRedo>();
         private readonly ObservableCollection<IUndoRedo> _undoList = new ObservableCollection<IUndoRedo>();
-
         public ReadOnlyObservableCollection<IUndoRedo> RedoList { get; }
         public ReadOnlyObservableCollection<IUndoRedo> UndoList { get; }
 
@@ -63,15 +64,16 @@ namespace PrimalEditor.Utilities
 
         public void Add(IUndoRedo cmd)
         {
-            if (!_enableAdd)
-                return;
-            _undoList.Add(cmd);
-            _redoList.Clear();
+            if (_enableAdd)
+            {
+                _undoList.Add(cmd);
+                _redoList.Clear();
+            }
         }
 
         public void Undo()
         {
-            if ( _undoList.Any())
+            if (_undoList.Any())
             {
                 var cmd = _undoList.Last();
                 _undoList.RemoveAt(_undoList.Count - 1);
@@ -84,7 +86,7 @@ namespace PrimalEditor.Utilities
 
         public void Redo()
         {
-            if ( _redoList.Any())
+            if (_redoList.Any())
             {
                 var cmd = _redoList.First();
                 _redoList.RemoveAt(0);
@@ -94,11 +96,11 @@ namespace PrimalEditor.Utilities
                 _undoList.Add(cmd);
             }
         }
+
         public UndoRedo()
         {
             RedoList = new ReadOnlyObservableCollection<IUndoRedo>(_redoList);
             UndoList = new ReadOnlyObservableCollection<IUndoRedo>(_undoList);
         }
     }
-
 }

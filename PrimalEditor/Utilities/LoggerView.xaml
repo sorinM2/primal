@@ -7,8 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-
-
+        
         <Style TargetType="{x:Type ToggleButton}">
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="BorderBrush" Value="{StaticResource Editor.Window.GrayBrush4}"/>
@@ -20,18 +19,16 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ToggleButton}">
-                        <Border x:Name="outerBorder"
-                                BorderBrush="{TemplateBinding BorderBrush}" 
-                                BorderThickness="{TemplateBinding BorderThickness}" 
-                                SnapsToDevicePixels="true">
+                        <Border x:Name="outerBorder" BorderThickness="{TemplateBinding BorderThickness}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" SnapsToDevicePixels="true">
                             <Border x:Name="innerBorder" Background="{TemplateBinding Background}" Margin="1"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="BorderBrush" TargetName="outerBorder" 
+                                <Setter Property="BorderBrush" TargetName="outerBorder"
                                         Value="{Binding Background, ElementName=innerBorder}"/>
                             </Trigger>
-                            <Trigger Property="IsChecked" Value="false">
+                            <Trigger Property="IsChecked" Value="False">
                                 <Setter Property="Opacity" TargetName="innerBorder" Value="0.5"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="false">
@@ -44,9 +41,9 @@
         </Style>
     </UserControl.Resources>
     <Grid>
-
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
-                      x:Name="ScrollViewer" Background="{StaticResource Editor.Window.GrayBrush2}">
+                      x:Name="scrollViewer" Background="{StaticResource Editor.Window.GrayBrush2}"
+                      Margin="0,32,0,0">
             <ItemsControl ItemsSource="{Binding Source={x:Static local:Logger.FilteredMessages}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -63,14 +60,14 @@
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter Property="Background">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="{StaticResource Editor.Selected.BackGround}" Opacity="0.5"/>
+                                                    <SolidColorBrush Color="{StaticResource Editor.Selected.BackgroundColor}" Opacity="0.5"/>
                                                 </Setter.Value>
                                             </Setter>
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
                             </DockPanel.Style>
-                            <TextBlock Text="{Binding Time, StringFormat=hh:mm:ss}" Margin="5, 0">
+                            <TextBlock Text="{Binding Time, StringFormat=hh:mm:ss}" Margin="5,0">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Foreground" Value="LightGreen"/>
@@ -95,13 +92,13 @@
             <Border.Effect>
                 <DropShadowEffect Opacity="0.3" BlurRadius="10" ShadowDepth="0"/>
             </Border.Effect>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="4, 0" VerticalAlignment="Center">
-                <Button Content="Clear" Margin="1, 0" Click="OnClearButton_Click" Focusable="False"/>
-                <ToggleButton IsChecked="True" Content="info" Margin="1, 0" ToolTip="Toggle information messages"
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="4,0" VerticalAlignment="Center">
+                <Button Content="Clear" Margin="1,0" Click="OnClear_Button_Click" Focusable="False"/>
+                <ToggleButton IsChecked="True" Content="info" Margin="1,0" ToolTip="Toggle information messages"
                               x:Name="toggleInfo" Background="{StaticResource Editor.GreenBrush}"/>
-                <ToggleButton IsChecked="True" Content="warn" Margin="1, 0" ToolTip="Toggle warning messages"
+                <ToggleButton IsChecked="True" Content="warn" Margin="1,0" ToolTip="Toggle warning messages"
                               x:Name="toggleWarnings" Background="{StaticResource Editor.OrangeBrush}"/>
-                <ToggleButton IsChecked="True" Content="error" Margin="1, 0" ToolTip="Toggle error messages"
+                <ToggleButton IsChecked="True" Content="error" Margin="1,0" ToolTip="Toggle error messages"
                               x:Name="toggleErrors" Background="{StaticResource Editor.RedBrush}"/>
             </StackPanel>
         </Border>

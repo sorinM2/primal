@@ -1,8 +1,9 @@
-﻿using System;
+﻿// Copyright (c) Arash Khatami
+// Distributed under the MIT license. See the LICENSE file in the project root for more information.
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -20,17 +21,17 @@ namespace PrimalEditor.GameProject
     /// </summary>
     public partial class ProjectBrowserDialog : Window
     {
-        private CubicEase _easing = new CubicEase() { EasingMode = EasingMode.EaseInOut };
+        private readonly CubicEase _easing = new CubicEase() { EasingMode = EasingMode.EaseInOut };
         public ProjectBrowserDialog()
         {
             InitializeComponent();
-            Loaded += OnProjectBrowserOpened;
+            Loaded += OnProjectBrowserDialogLoaded;
         }
 
-        private void OnProjectBrowserOpened(object sender, RoutedEventArgs e)
+        private void OnProjectBrowserDialogLoaded(object sender, RoutedEventArgs e)
         {
-            Loaded -= OnProjectBrowserOpened;
-            if (!OpenProject.Projects.Any())
+            Loaded -= OnProjectBrowserDialogLoaded;
+            if(!OpenProject.Projects.Any())
             {
                 openProjectButton.IsEnabled = false;
                 openProjectView.Visibility = Visibility.Hidden;
@@ -40,19 +41,20 @@ namespace PrimalEditor.GameProject
 
         private void AnimateToCreateProject()
         {
-            var highlightAnimation = new DoubleAnimation(225, 425, new Duration(TimeSpan.FromSeconds(0.2)));
+            var highlightAnimation = new DoubleAnimation(200, 400, new Duration(TimeSpan.FromSeconds(0.2)));
             highlightAnimation.EasingFunction = _easing;
             highlightAnimation.Completed += (s, e) =>
             {
-                var animation = new ThicknessAnimation( new Thickness(0), new Thickness(-1600, 0, 0, 0), new Duration(TimeSpan.FromSeconds(0.5)));
+                var animation = new ThicknessAnimation(new Thickness(0), new Thickness(-1600, 0, 0, 0), new Duration(TimeSpan.FromSeconds(0.5)));
                 animation.EasingFunction = _easing;
                 browserContent.BeginAnimation(MarginProperty, animation);
             };
             highlightRect.BeginAnimation(Canvas.LeftProperty, highlightAnimation);
         }
+
         private void AnimateToOpenProject()
         {
-            var highlightAnimation = new DoubleAnimation(425, 225, new Duration(TimeSpan.FromSeconds(0.2)));
+            var highlightAnimation = new DoubleAnimation(400, 200, new Duration(TimeSpan.FromSeconds(0.2)));
             highlightAnimation.EasingFunction = _easing;
             highlightAnimation.Completed += (s, e) =>
             {
@@ -62,27 +64,28 @@ namespace PrimalEditor.GameProject
             };
             highlightRect.BeginAnimation(Canvas.LeftProperty, highlightAnimation);
         }
+
         private void OnToggleButton_Click(object sender, RoutedEventArgs e)
         {
-            if ( sender == openProjectButton )
+            if(sender == openProjectButton)
             {
-                if ( createProjectButton.IsChecked == true )
+                if(createProjectButton.IsChecked == true)
                 {
                     createProjectButton.IsChecked = false;
                     AnimateToOpenProject();
-                    newProjectView.IsEnabled = false;
                     openProjectView.IsEnabled = true;
+                    newProjectView.IsEnabled = false;
                 }
                 openProjectButton.IsChecked = true;
             }
             else
             {
-                if ( openProjectButton.IsChecked == true )
+                if (openProjectButton.IsChecked == true)
                 {
                     openProjectButton.IsChecked = false;
                     AnimateToCreateProject();
-                    newProjectView.IsEnabled = true;
                     openProjectView.IsEnabled = false;
+                    newProjectView.IsEnabled = true;
                 }
                 createProjectButton.IsChecked = true;
             }

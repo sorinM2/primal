@@ -1,8 +1,8 @@
-﻿ using System;
+﻿// Copyright (c) Arash Khatami
+// Distributed under the MIT license. See the LICENSE file in the project root for more information.
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 namespace PrimalEditor.GameProject
 {
     /// <summary>
-    /// Interaction logic for CreateProjectView.xaml
+    /// Interaction logic for NewProjectView.xaml
     /// </summary>
     public partial class NewProjectView : UserControl
     {
@@ -28,15 +28,14 @@ namespace PrimalEditor.GameProject
         private void OnCreate_Button_Click(object sender, RoutedEventArgs e)
         {
             var vm = DataContext as NewProject;
-
-            var projectPath = vm.CreateProject( templateListBox.SelectedItem as ProjectTemplate );
-            var win = Window.GetWindow(this);
+            var projectPath = vm.CreateProject(templateListBox.SelectedItem as ProjectTemplate);
             bool dialogResult = false;
-            if ( !string.IsNullOrEmpty(projectPath))
+            var win = Window.GetWindow(this);
+            if(!string.IsNullOrEmpty(projectPath))
             {
                 dialogResult = true;
-                var Project = OpenProject.Open(new ProjectData() { ProjectName = vm.ProjectName, ProjectPath = projectPath });
-                win.DataContext = Project;
+                var project = OpenProject.Open(new ProjectData() { ProjectName = vm.ProjectName, ProjectPath = projectPath });
+                win.DataContext = project;
             }
             win.DialogResult = dialogResult;
             win.Close();

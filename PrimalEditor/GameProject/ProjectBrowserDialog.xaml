@@ -4,18 +4,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PrimalEditor.GameProject"
-        mc:Ignorable="d" ResizeMode = "NoResize"  WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
         Title="Project Browser" Height="600" Width="800"
         Style="{StaticResource PrimalDialogStyle}">
     <Window.Resources>
-
         <Style TargetType="{x:Type ToggleButton}">
             <Setter Property="FontSize" Value="32"/>
             <Setter Property="FontFamily" Value="Bahnschrift condensed"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="Foreground" Value="{StaticResource Editor.Disabled.FontBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Template">
@@ -49,35 +47,35 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
-            <RowDefinition/>
-
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Canvas x:Name="canvas">
             <Rectangle Width="{Binding Path=ActualWidth, ElementName=createProjectButton}"
-                       Height="{Binding Path=ActualHeight, ElementName=canvas}"
-                       x:Name="highlightRect" Canvas.Left="225" Opacity="0.3">
+                       Height="{Binding Path=ActualHeight,ElementName=canvas}"
+                       x:Name="highlightRect" Canvas.Left="200" Opacity="0.3">
                 <Rectangle.Effect>
                     <BlurEffect Radius="10" KernelType="Gaussian"/>
                 </Rectangle.Effect>
                 <Rectangle.Fill>
-                    <RadialGradientBrush GradientOrigin="0.5, 1" Center="0.5, 1" RadiusY="2">
+                    <RadialGradientBrush GradientOrigin="0.5,1" Center="0.5,1" RadiusY="2">
                         <RadialGradientBrush.GradientStops>
                             <GradientStop Color="White" Offset="0"/>
-                            <GradientStop Color="Transparent"  Offset="1"/>
+                            <GradientStop Color="Transparent" Offset="1"/>
                         </RadialGradientBrush.GradientStops>
                     </RadialGradientBrush>
                 </Rectangle.Fill>
                 <Rectangle.OpacityMask>
-                    <RadialGradientBrush GradientOrigin="0.5, 1" Center="0.5, 1" RadiusY="0.5">
+                    <RadialGradientBrush GradientOrigin="0.5,1" Center="0.5,1" RadiusY="0.5">
                         <RadialGradientBrush.GradientStops>
                             <GradientStop Color="White" Offset="0"/>
                             <GradientStop Color="Transparent" Offset="1"/>
                         </RadialGradientBrush.GradientStops>
                     </RadialGradientBrush>
                 </Rectangle.OpacityMask>
+                
             </Rectangle>
         </Canvas>
-        <Rectangle Height="2" VerticalAlignment="Bottom" Margin="40, 0">
+        <Rectangle Height="2" VerticalAlignment="Bottom" Margin="40,0">
             <Rectangle.Fill>
                 <LinearGradientBrush>
                     <LinearGradientBrush.GradientStops>
@@ -90,19 +88,17 @@
             </Rectangle.Fill>
         </Rectangle>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <ToggleButton Content="Open Project" x:Name="openProjectButton" FontSize="32"
-                          Margin="10, 20, 0, 20" Click="OnToggleButton_Click" IsChecked="true"></ToggleButton>
-            <ToggleButton Content="Create Project" x:Name="createProjectButton" 
-                           Margin="40, 20, 0, 20" Click="OnToggleButton_Click"></ToggleButton>
-
+            <ToggleButton Content="OPEN PROJECT" x:Name="openProjectButton" Margin="10,20,0,20"
+                          Click="OnToggleButton_Click" IsChecked="True"/>
+            <ToggleButton Content="CREATE PROJECT" x:Name="createProjectButton" Margin="40,20,0,20"
+                          Click="OnToggleButton_Click" IsChecked="False"/>
         </StackPanel>
-
-        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0, 0, 0, 0" x:Name="browserContent">
+        <StackPanel Orientation="Horizontal" Grid.Row="1" x:Name="browserContent">
             <StackPanel.Effect>
                 <DropShadowEffect Opacity="0.6" BlurRadius="15" ShadowDepth="2"/>
             </StackPanel.Effect>
-            <local:OpenProjectView x:Name="openProjectView"/>
-            <local:NewProjectView x:Name="newProjectView" Margin="800, 0, 0 ,0"/>
+            <local:OpenProjectView x:Name="openProjectView" />
+            <local:NewProjectView x:Name="newProjectView" Margin="800,0,0,0"/>
         </StackPanel>
     </Grid>
 </Window>

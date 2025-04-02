@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,7 +14,6 @@ using System.Windows.Shapes;
 
 namespace PrimalEditor.Editors
 {
-
     [ContentProperty("ComponentContent")]
     public partial class ComponentView : UserControl
     {
@@ -29,7 +26,6 @@ namespace PrimalEditor.Editors
         public static readonly DependencyProperty HeaderProperty =
             DependencyProperty.Register(nameof(Header), typeof(string), typeof(ComponentView));
 
-
         public FrameworkElement ComponentContent
         {
             get { return (FrameworkElement)GetValue(ComponentContentProperty); }
@@ -38,7 +34,6 @@ namespace PrimalEditor.Editors
 
         public static readonly DependencyProperty ComponentContentProperty =
             DependencyProperty.Register(nameof(ComponentContent), typeof(FrameworkElement), typeof(ComponentView));
-
 
         public ComponentView()
         {

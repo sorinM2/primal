@@ -1,8 +1,8 @@
-﻿using System;
+﻿// Copyright (c) Arash Khatami
+// Distributed under the MIT license. See the LICENSE file in the project root for more information.
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -25,7 +25,7 @@ namespace PrimalEditor.Utilities
             InitializeComponent();
         }
 
-        private void OnClearButton_Click(object sender, RoutedEventArgs e)
+        private void OnClear_Button_Click(object sender, RoutedEventArgs e)
         {
             Logger.Clear();
         }
@@ -33,13 +33,9 @@ namespace PrimalEditor.Utilities
         private void OnMessageFilter_Button_Click(object sender, RoutedEventArgs e)
         {
             var filter = 0x0;
-            if (toggleInfo.IsChecked == true)
-                filter |= (int)MessageType.Info;
-            if (toggleWarnings.IsChecked == true)
-                filter |= (int)MessageType.Warning;
-            if (toggleErrors.IsChecked == true)
-                filter |= (int)MessageType.Error;
-
+            if (toggleInfo.IsChecked == true) filter |= (int)MessageType.Info;
+            if (toggleWarnings.IsChecked == true) filter |= (int)MessageType.Warning;
+            if (toggleErrors.IsChecked == true) filter |= (int)MessageType.Error;
             Logger.SetMessageFilter(filter);
         }
     }
