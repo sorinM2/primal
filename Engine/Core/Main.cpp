@@ -1,12 +1,39 @@
-/* Things to do to create a game project:
+#ifdef _WIN64
 
-    1) Generate an MSVC solution/project
-    2) Add files that contain the script
-    3) Set include and library directories
-    4) Set force include file (GameEntity.h)
-    5) Set c++ language version and calling convension
-*/
-int main()
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIND32_LEAN_AND_MEAN
+#endif
+#include <Windows.h>
+#include <crtdbg.h>
+#ifndef USE_WITH_EDITOR
+
+extern bool engine_intialize();
+extern void engine_update();
+extern void engine_shutdown();
+
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-    return 0;
+#if _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+	if (engine_intialize())
+	{
+		MSG msg{};
+		bool is_running{ true };
+		while (is_running)
+		{
+			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+				is_running = (msg.message != WM_QUIT);
+			}
+			engine_update();
+		}
+	}
+	engine_shutdown();
+	return 0;
 }
+#endif
+
+#endif

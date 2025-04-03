@@ -39,6 +39,7 @@ struct script_component
         script::init_info info{};
         info.script_creator = script_creator;
         return info;
+
     }
 };
 
