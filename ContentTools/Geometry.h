@@ -3,11 +3,63 @@
 
 namespace primal::tools
 {
+	namespace packed_vertex
+	{
+		struct vertex_static
+		{
+			math::v3 position;
+			u8 reserved[3];
+			u8 t_sign; // direction of the normal which we will be storing in a compressed format
+			u16 normal[2];
+			u16 tangent[2];
+			math::v2 uv;
+		};
+	}
+	struct vertex
+	{
+		math::v4 tangent{};
+		math::v3 position{};
+		math::v3 normal{};
+		math::v2 uv{};
+	};
 
-	struct  geometry_impoert_settings
+	struct mesh
+	{
+
+		//Initial data
+		utl::vector<math::v3>				positions;
+		utl::vector<math::v3>				normals;
+		utl::vector<math::v4>				tangents;
+		utl::vector<std::vector<math::v2>>	uv_sets;
+
+		utl::vector<u32>					raw_indices;
+
+		//Intermediate data
+		utl::vector<vertex>					vertices;
+		utl::vector<u32>					indices;
+		//Output data
+		std::string							name;
+		utl::vector<packed_vertex::vertex_static> packed_vertex_static;
+		f32 lod_treshhold{ -1.f };
+		u32 lod_id{ u32_invalid_id };
+	};
+
+	struct lod_group
+	{
+		std::string name;
+		utl::vector<mesh> meshes;
+	};
+
+	struct scene
+	{
+		std::string name;
+		utl::vector<lod_group> lod_groups;
+	};
+
+	struct  geometry_import_settings
 	{
 		f32 smoothing_angle;
-		u8 calculate_noramals;
+		u8 calculate_normals;
 		u8 calculate_tangents;
 		u8 reverse_handedness;
 		u8 import_embeded_textures;
@@ -18,6 +70,9 @@ namespace primal::tools
 	{
 		u8* buffer;
 		u32 buffer_size;
-		geometry_impoert_settings settings;
+		geometry_import_settings settings;
 	};
+
+	void process_scene(scene& scene, const geometry_import_settings& settings);
+	void pack_data(const scene& scene, scene_data& data);
 }
