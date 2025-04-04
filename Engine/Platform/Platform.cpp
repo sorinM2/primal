@@ -103,6 +103,22 @@ namespace primal::platform
 			MoveWindow(info.hwnd, info.top_left.x, info.top_left.y, width, height, true);
 		}
 
+		void resize_window(u32 id, const RECT& area)
+		{
+			window_info& info{ get_from_id(id) };
+			if (info.style & WS_CHILD)
+			{
+				GetClientRect(info.hwnd, &info.client_area);
+				return;
+			}
+			RECT window_rect{ area };
+			AdjustWindowRect(&window_rect, info.style, FALSE);
+			const s32 width{ window_rect.right - window_rect.left };
+			const s32 height{ window_rect.bottom - window_rect.top };
+
+			MoveWindow(info.hwnd, info.top_left.x, info.top_left.y, width, height, true);
+		}
+
 		void set_window_fullscreen(u32 id, bool is_fullscreen)
 		{
 			window_info& info{ get_from_id(id) };
@@ -116,13 +132,11 @@ namespace primal::platform
 					GetWindowRect(info.hwnd, &rect);
 					info.top_left.x = rect.left;
 					info.top_left.y = rect.top;
-					info.style = 0;
-					SetWindowLongPtr(info.hwnd, GWL_STYLE, info.style);
+					SetWindowLongPtr(info.hwnd, GWL_STYLE, 0);
 					ShowWindow(info.hwnd, SW_MAXIMIZE);
 				}
 				else
 				{
-					info.style = WS_VISIBLE | WS_OVERLAPPEDWINDOW;
 					SetWindowLongPtr(info.hwnd, GWL_STYLE, info.style);
 					resize_window(info, info.client_area);
 					ShowWindow(info.hwnd, SW_SHOWNORMAL);
@@ -149,7 +163,7 @@ namespace primal::platform
 		math::u32v4 get_window_size(u32 id)
 		{
 			window_info& info{ get_from_id(id) };
-			RECT area{ info.is_fullscreen ? info.fullscreen_area : info.client_area };
+			RECT& area{ info.is_fullscreen ? info.fullscreen_area : info.client_area };
 			return { (u32)area.left, (u32)area.top, (u32)area.right, (u32)area.bottom };
 		}
 
@@ -200,6 +214,8 @@ namespace primal::platform
 		info.client_area.bottom = (init_info && init_info->height) ? info.client_area.bottom + init_info->height : info.client_area.bottom;
 
 		RECT rc{ info.client_area };
+		info.style |= parent ? WS_CHILD : WS_OVERLAPPEDWINDOW;
+
 		AdjustWindowRect(&rc, info.style, FALSE);
 		const wchar_t* caption{ (init_info && init_info->caption) ? init_info->caption : L"Primal Game" };
 		const s32 left{ (init_info) ? init_info->left : info.top_left.x };
@@ -207,7 +223,6 @@ namespace primal::platform
 		const s32 width{ rc.right - rc.left };
 		const s32 height{ rc.bottom - rc.top };
 
-		info.style |= parent ? WS_CHILD : WS_OVERLAPPEDWINDOW;
 
 		info.hwnd = CreateWindowEx(
 			0,
