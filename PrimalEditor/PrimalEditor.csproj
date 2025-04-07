@@ -6,6 +6,7 @@
     <UseWPF>true</UseWPF>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	<Configurations>DebugEditor;ReleaseEditor</Configurations>
+  <XamlDebuggingInformation>True</XamlDebuggingInformation>
 	<Platforms>x64</Platforms>
   </PropertyGroup>
 

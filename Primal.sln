@@ -1,17 +1,26 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35825.156 d17.13
+VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrimalEditor", "PrimalEditor\PrimalEditor.csproj", "{B81039D7-6FAD-4EBE-B772-657B0F3600FA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcxproj", "{FCA0E998-F996-4F06-B797-B2AA744845D9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EngineTest", "EngineTest\EngineTest.vcxproj", "{2BC60D31-EC9B-45EF-AC9D-AEFFB3617859}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FCA0E998-F996-4F06-B797-B2AA744845D9} = {FCA0E998-F996-4F06-B797-B2AA744845D9}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EngineDLL", "EngineDLL\EngineDLL.vcxproj", "{2749847B-F4FB-47CF-8652-E067D6BA09B5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FCA0E998-F996-4F06-B797-B2AA744845D9} = {FCA0E998-F996-4F06-B797-B2AA744845D9}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ContentTools", "ContentTools\ContentTools.vcxproj", "{E764AC0B-6482-454A-A55E-ED5BBFBB9665}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FCA0E998-F996-4F06-B797-B2AA744845D9} = {FCA0E998-F996-4F06-B797-B2AA744845D9}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
