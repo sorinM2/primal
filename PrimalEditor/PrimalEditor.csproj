@@ -27,8 +27,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Resources\PrimitiveMeshView\Checkermap.png" />
+    <None Remove="Resources\PrimitiveMeshView\PlaneTexture.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="envdte" Version="17.13.40008" />
     <PackageReference Include="envdte80" Version="17.13.40008" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\PrimitiveMeshView\Checkermap.png" />
+    <Resource Include="Resources\PrimitiveMeshView\PlaneTexture.png" />
   </ItemGroup>
 
 </Project>

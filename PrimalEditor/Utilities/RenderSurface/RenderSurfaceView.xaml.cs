@@ -1,4 +1,4 @@
-﻿using PrimalEditor.Components;
+﻿using PrimalEditor.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,8 +33,7 @@ namespace PrimalEditor.Utilities
             WM_SIZE = 0x0005,
         }
         private RenderSurfaceHost _host = null;
-        private bool _canResize = true;
-        private bool _moved = false;
+
         public RenderSurfaceView()
         {
             InitializeComponent();
@@ -48,40 +47,6 @@ namespace PrimalEditor.Utilities
             _host = new RenderSurfaceHost(ActualWidth, ActualHeight);
             _host.MessageHook += new HwndSourceHook(HostMsgFilter);
             Content = _host;
-
-            var window = this.FindVisualParent<Window>();
-            Debug.Assert(window != null);
-
-            var helper = new WindowInteropHelper(window);
-            if (helper.Handle != null)
-            {
-                HwndSource.FromHwnd(helper.Handle)?.AddHook(HwndMessageHook);
-            }
-        }
-
-        private nint HwndMessageHook(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
-        {
-            switch ((Win32Msg)msg)
-            {
-                case Win32Msg.WM_SIZING:
-                    _canResize = false;
-                    _moved = false;
-                    break;
-                case Win32Msg.WM_ENTERSIZEMOVE:
-                    _moved = true;
-                    break;
-                case Win32Msg.WM_EXISTSIZEMOVE:
-                    _canResize = true;
-                    if ( !_moved)
-                    {
-                        _host.Resize();
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-            return IntPtr.Zero;
         }
 
         private IntPtr HostMsgFilter(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled)
@@ -92,10 +57,7 @@ namespace PrimalEditor.Utilities
                 case Win32Msg.WM_ENTERSIZEMOVE: throw new Exception();
                 case Win32Msg.WM_EXISTSIZEMOVE: throw new Exception();
                 case Win32Msg.WM_SIZE:
-                    if (_canResize)
-                    {
-                        _host.Resize();
-                    }
+
                     break;
                 default:
                     break;

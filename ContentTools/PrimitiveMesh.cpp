@@ -64,9 +64,12 @@ namespace primal::tools
 
 					m.positions.emplace_back(position.x * info.size.x, position.y * info.size.y, position.z * info.size.z);
 
-					v2 uv{ u_range.x, 1.f - v_range.x };
-					uv.x += i * u_step;
-					uv.y -= j * v_step;
+					//v2 uv{ u_range.x, 1.f - v_range.x };
+					//uv.x += i * u_step;
+					//uv.y -= j * v_step;
+					v2 uv{ 0, 1.f };
+					uv.x += (i % 2);
+					uv.y -= (j % 2);
 					uvs.emplace_back(uv);
 				}
 
@@ -101,7 +104,7 @@ namespace primal::tools
 
 			const u32 num_indices{ 3 * 2 * horizontal_count * vertical_count };
 			assert(m.raw_indices.size() == num_indices);
-
+			m.uv_sets.resize(1);
 			for (u32 i{ 0 }; i < num_indices; ++i)
 			{
 				m.uv_sets[0].emplace_back(uvs[m.raw_indices[i]]);
@@ -114,7 +117,6 @@ namespace primal::tools
 		{
 			lod_group lod{};
 			lod.name = "plane";
-			lod.meshes.emplace_back();
 			lod.meshes.emplace_back(create_plane(info));
 			scene.lod_groups.emplace_back(lod);
 		}

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
-namespace PrimalEditor.Components
+namespace PrimalEditor.Common
 {
     static class VisualExtensions
     {
@@ -24,6 +25,22 @@ namespace PrimalEditor.Components
                 parent = VisualTreeHelper.GetParent(parent);
             }
             return null;
+        }
+    }
+
+    public static class ContentHelper
+    {
+        public static string GetRandomString(int length = 8)
+        {
+            if (length <= 0) length = 8;
+            var n = length / 11;
+            var sb = new StringBuilder();
+
+            for ( int i = 0; i <= n; ++i)
+            {
+                sb.Append(Path.GetRandomFileName().Replace(".", ""));
+            }
+            return sb.ToString(0, length);  
         }
     }
 }
