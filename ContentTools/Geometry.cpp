@@ -35,7 +35,7 @@ namespace primal::tools
 
 		void process_normals(mesh& m, f32 smoothing_angle)
 		{
-			const f32 cos_alpha{ XMScalarCos(pi - smoothing_angle * pi / 180) };
+			const f32 cos_alpha{ XMScalarCos(pi - smoothing_angle * pi / 180.f) };
 			const bool is_hard_edge{ XMScalarNearEqual(smoothing_angle, 180.f, epsilon) };
 			const bool is_soft_edge{ XMScalarNearEqual(smoothing_angle, 0.f, epsilon) };
 			const u32 num_indices{ (u32)m.raw_indices.size() };
@@ -102,7 +102,7 @@ namespace primal::tools
 			utl::vector<utl::vector<u32>> idx_ref(num_vertices);
 
 			for (u32 i{ 0 }; i < num_indices; ++i)
-				idx_ref[m.raw_indices[i]].emplace_back(i);
+				idx_ref[old_indices[i]].emplace_back(i);
 
 			for (u32 i{ 0 }; i < num_vertices; ++i)
 			{
@@ -163,7 +163,7 @@ namespace primal::tools
 			}
 			process_normals(m, settings.smoothing_angle);
 
-			if (!m.uv_sets.empty())
+			if (!m.uv_sets.empty() )
 			{
 				process_uvs(m);
 			}
