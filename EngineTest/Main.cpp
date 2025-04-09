@@ -2,12 +2,14 @@
 #include "Windows.h"
 
 #define TEST_ENTITY_COMPONENTS 0
-#define TEST_WINDOW 1
-
+#define TEST_WINDOW 0
+#define TEST_RENDERER 1
 #if TEST_ENTITY_COMPONENTS
 #include "TestEntityComponents.h"
 #elif TEST_WINDOW
 #include "WindowTest.h"
+#elif TEST_RENDERER
+#include "TestRenderer.h"
 #endif
 
 
