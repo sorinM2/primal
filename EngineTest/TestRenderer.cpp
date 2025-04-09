@@ -3,6 +3,7 @@
 #include "..\Platform\PlatformTypes.h"
 #include "..\Graphics\Renderer.h"
 
+#if TEST_RENDERER
 using namespace primal;
 
 graphics::render_surface _surfaces[4];
@@ -70,6 +71,7 @@ bool engine_test::initialize()
 void engine_test::run() 
 {
 	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	graphics::render();
 }
 
 void engine_test::shutdown() 
@@ -81,3 +83,4 @@ void engine_test::shutdown()
 
 	graphics::shutdown();
 }
+#endif

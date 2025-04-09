@@ -22,4 +22,5 @@ namespace primal::graphics
 
 	bool initialize(graphics_platform platform);
 	void shutdown();
+	void render();
 }
