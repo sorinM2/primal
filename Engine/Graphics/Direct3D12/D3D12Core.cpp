@@ -1,7 +1,7 @@
 #include "D3D12Common.h"
 #include "D3D12Core.h"
 #include "D3D12Resources.h"
-
+#include "D3D12Surface.h"
 using namespace Microsoft::WRL;
 namespace primal::graphics::d3d12::core
 {
@@ -161,6 +161,8 @@ namespace primal::graphics::d3d12::core
 		ID3D12Device8*				main_device{ nullptr };
 		IDXGIFactory7*				dxgi_factory;
 		d3d12_command				gfx_command;
+		utl::vector<d3d12_surface>  surfaces;
+
 		descriptor_heap				rtv_descriptor_heap{ D3D12_DESCRIPTOR_HEAP_TYPE_RTV };
 		descriptor_heap				dsv_descriptor_heap{ D3D12_DESCRIPTOR_HEAP_TYPE_DSV };
 		descriptor_heap				srv_descriptor_heap{ D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV };
@@ -169,6 +171,10 @@ namespace primal::graphics::d3d12::core
 		utl::vector<IUnknown*>		deferred_releases[frame_buffer_count];
 		u32							deferred_releases_flag[frame_buffer_count]{};
 		std::mutex					deferred_releases_mutx{};
+
+		
+
+
 		constexpr D3D_FEATURE_LEVEL minimum_feature_level{ D3D_FEATURE_LEVEL_11_0 };
 		bool failed_init()
 		{
@@ -243,7 +249,7 @@ namespace primal::graphics::d3d12::core
 		void deferred_release(IUnknown* resource)
 		{
 			const u32 frame_idx{ current_frame_index()};
-			std::lock_guard{ deferred_releases_mutx };
+			std::lock_guard guard{ deferred_releases_mutx };
 			deferred_releases[frame_idx].push_back(resource);
 			set_deferred_releases_flag();
 		}
@@ -350,22 +356,39 @@ namespace primal::graphics::d3d12::core
 		release(main_device);
 	}
 
-	void render()
+	DXGI_FORMAT render_target_format
 	{
-		gfx_command.begin_frame();
-		ID3D12GraphicsCommandList* cmd_list{ gfx_command.command_list() };
-		const u32 frame_index{ current_frame_index() };
-		if (deferred_releases_flag[frame_index])
-		{
-			process_deferred_releases(frame_index);
-		}
+		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB
+	};
 
-		gfx_command.end_frame();
+	DXGI_FORMAT default_render_target_format()
+	{
+		return render_target_format;
 	}
 
 	ID3D12Device* const device()
 	{
 		return main_device;
+	}
+
+	descriptor_heap& rtv_heap()
+	{
+		return rtv_descriptor_heap;
+	}
+
+	descriptor_heap& dsv_heap()
+	{
+		return dsv_descriptor_heap;
+	}
+
+	descriptor_heap& srv_heap()
+	{
+		return  srv_descriptor_heap;
+	}
+
+	descriptor_heap& uav_heap()
+	{
+		return uav_descriptor_heap;
 	}
 
 	u32 current_frame_index()
@@ -377,4 +400,50 @@ namespace primal::graphics::d3d12::core
 	{
 		deferred_releases_flag[current_frame_index()] = 1;
 	}
+
+	surface create_surface(platform::window window)
+	{
+		surfaces.emplace_back(window);
+		surface_id id{ id::id_type(surfaces.size() - 1)};
+		surfaces[id].create_swap_chain(dxgi_factory, gfx_command.command_queue(), default_render_target_format());
+		return surface{ id };
+	}
+
+	void remove_surface(surface_id id)
+	{
+		gfx_command.flush();
+		surfaces[id].~d3d12_surface();
+	}
+
+	void resize_surface(surface_id id, u32 width, u32 height)
+	{
+		gfx_command.flush();
+		surfaces[id].resize();
+	}
+
+	u32 surface_width(surface_id id)
+	{
+		return surfaces[id].width();
+	}
+
+	u32 surface_height(surface_id id)
+	{
+		return surfaces[id].height();
+	}
+
+	void render_surface(surface_id id)
+	{
+		gfx_command.begin_frame();
+		ID3D12GraphicsCommandList* cmd_list{ gfx_command.command_list() };
+		const u32 frame_index{ current_frame_index() };
+		if (deferred_releases_flag[frame_index])
+		{
+			process_deferred_releases(frame_index);
+		}
+
+		const d3d12_surface& surface{ surfaces[id] };
+		surface.present();
+		gfx_command.end_frame();
+	}
+
 }
