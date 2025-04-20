@@ -17,42 +17,18 @@ namespace primal::platform
 		};
 
 
-		utl::vector<window_info> windows;
-		utl::vector<u32> avaliable_slots;
+		utl::free_list<window_info> windows;
+		
 
 		window_info& get_from_id(u32 id)
 		{
-			assert(id < windows.size());
+			assert(id <= windows.size());
 			return windows[id];
 		}
 
 		window_info& get_from_handle(window_handle handle)
 		{
-			return get_from_id( (u32)GetWindowLongPtr(handle, GWLP_USERDATA));
-		}
-
-		u32 add_to_windows(window_info info)
-		{
-			u32 id{ u32_invalid_id };
-			if (avaliable_slots.empty())
-			{
-				id = (u32)windows.size();
-				windows.emplace_back(info);
-			}
-			else
-			{
-				id = avaliable_slots.back();
-				avaliable_slots.pop_back();
-				assert(id != u32_invalid_id);
-				windows[id] = info;
-			}
-			return id;
-		}
-
-		void remove_from_windows(u32 id)
-		{
-			assert(id < windows.size());
-			avaliable_slots.emplace_back(id);
+			return get_from_id((u32)GetWindowLongPtr(handle, GWLP_USERDATA));
 		}
 
 		LRESULT CALLBACK internal_window_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -242,7 +218,7 @@ namespace primal::platform
 		if (info.hwnd)
 		{
 			DEBUG_OP(SetLastError(0));
-			window_id id{ add_to_windows(info) };
+			window_id id{ windows.add(info) };
 			SetWindowLongPtr(info.hwnd, GWLP_USERDATA, (LONG_PTR)id);
 			if (callback) SetWindowLongPtr(info.hwnd, 0, (LONG_PTR)callback);
 			assert(GetLastError() == 0);
@@ -258,7 +234,7 @@ namespace primal::platform
 	{
 		window_info& info{ get_from_id(id) };
 		DestroyWindow(info.hwnd);
-		remove_from_windows(id);
+		windows.remove(id);
 	}
 #else
 #error ""

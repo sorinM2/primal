@@ -1,11 +1,12 @@
 #pragma once
 
-#define USE_STL_VECTOR 1
+#define USE_STL_VECTOR 0
 #define USE_STL_DEQUE 1
 
 #if USE_STL_VECTOR
 #include <vector>
 #include <algorithm>
+
 namespace primal::utl {
     template<typename T>
     using vector = std::vector<T>;
@@ -24,6 +25,16 @@ namespace primal::utl {
         }
     }
 }
+#else
+#include "Vector.h"
+namespace primal::utl
+{
+    template<typename T>
+    void erase_unordered(vector<T>& v, size_t index)
+    {
+        v.erase_unordered(index);
+    }
+}
 #endif
 
 #if USE_STL_DEQUE
@@ -38,5 +49,6 @@ using deque = std::deque<T>;
 namespace primal::utl {
 
     // TODO: implement our own containers
-
 }
+
+#include "FreeList.h"
