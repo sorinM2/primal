@@ -1,7 +1,9 @@
 #include "D3D12Common.h"
 #include "D3D12Core.h"
-#include "D3D12Resources.h"
 #include "D3D12Surface.h"
+#include "D3D12Shaders.h"
+#include "D3D12GPass.h"
+#include "D3D12PostProcess.h"
 using namespace Microsoft::WRL;
 namespace primal::graphics::d3d12::core
 {
@@ -80,13 +82,14 @@ namespace primal::graphics::d3d12::core
 				DXCall(_cmd_list->Reset(frame.cmd_allocator, nullptr));
 			}
 
-			void end_frame()
+			void end_frame(const d3d12_surface& surface)
 			{
 				DXCall(_cmd_list->Close());
 				ID3D12CommandList* const cmd_lists[]{ _cmd_list }; 
 
 				_cmd_queue->ExecuteCommandLists(_countof(cmd_lists), &cmd_lists[0]);
 
+				surface.present();
 				u64& fence_value{ _fence_value };
 				++fence_value;
 				command_frame& frame{ _cmd_frames[_frame_index] };
@@ -125,7 +128,7 @@ namespace primal::graphics::d3d12::core
 			}
 
 			constexpr ID3D12CommandQueue* const command_queue() const { return _cmd_queue; };
-			constexpr ID3D12GraphicsCommandList6* const command_list() const { return _cmd_list; };
+			constexpr id3d12_graphics_command_list* const command_list() const { return _cmd_list; };
 			constexpr u32 frame_index() const { return _frame_index; }
 		private:
 			struct command_frame
@@ -150,20 +153,21 @@ namespace primal::graphics::d3d12::core
 				}
 			};
 			ID3D12CommandQueue*					_cmd_queue{ nullptr };
-			ID3D12GraphicsCommandList6*			_cmd_list{ nullptr };
+			id3d12_graphics_command_list*			_cmd_list{ nullptr };
 			ID3D12Fence1*						_fence{ nullptr };
-			u64									_fence_value;
-			HANDLE								_fence_event;
+			u64									_fence_value{};
+			HANDLE								_fence_event{};
 			command_frame						_cmd_frames[frame_buffer_count];
 			u32									_frame_index{ 0 };
 		};
 
 		using surface_container = utl::free_list<d3d12_surface>;
 
-		ID3D12Device8*				main_device{ nullptr };
+		id3d12_device*				main_device{ nullptr };
 		IDXGIFactory7*				dxgi_factory;
 		d3d12_command				gfx_command;
 		surface_container  surfaces;
+		d3dx::d3d12_resource_barier resource_barriers{};
 
 		descriptor_heap				rtv_descriptor_heap{ D3D12_DESCRIPTOR_HEAP_TYPE_RTV };
 		descriptor_heap				dsv_descriptor_heap{ D3D12_DESCRIPTOR_HEAP_TYPE_DSV };
@@ -292,21 +296,6 @@ namespace primal::graphics::d3d12::core
 		DXCall(hr = D3D12CreateDevice(main_adapter.Get(), max_feature_level, IID_PPV_ARGS(&main_device)));
 		if (FAILED(hr)) return failed_init();
 
-		bool result{ true };
-		result &= rtv_descriptor_heap.initialize(512, false);
-		result &= dsv_descriptor_heap.initialize(512, false);
-		result &= srv_descriptor_heap.initialize(4096, false);
-		result &= uav_descriptor_heap.initialize(512, false);
-		if (!result) return failed_init();
-
-		new (&gfx_command) d3d12_command(main_device, D3D12_COMMAND_LIST_TYPE_DIRECT);
-		if (!gfx_command.command_queue()) return failed_init();
-		NAME_D3D12_OBJECT(main_device, L"Main D3D12 Device");
-
-		NAME_D3D12_OBJECT(rtv_descriptor_heap.heap(), L"RTV descriptor heap");
-		NAME_D3D12_OBJECT(dsv_descriptor_heap.heap(), L"DSV descriptor heap");
-		NAME_D3D12_OBJECT(srv_descriptor_heap.heap(), L"SRV descriptor heap");
-		NAME_D3D12_OBJECT(uav_descriptor_heap.heap(), L"UAV descriptor heap");
 #ifdef _DEBUG
 		{
 			ComPtr<ID3D12InfoQueue> info_queue;
@@ -317,6 +306,26 @@ namespace primal::graphics::d3d12::core
 			info_queue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
 		}
 #endif
+
+		bool result{ true };
+		result &= rtv_descriptor_heap.initialize(512, false);
+		result &= dsv_descriptor_heap.initialize(512, false);
+		result &= srv_descriptor_heap.initialize(4096, true);
+		result &= uav_descriptor_heap.initialize(512, false);
+		if (!result) return failed_init();
+
+		new (&gfx_command) d3d12_command(main_device, D3D12_COMMAND_LIST_TYPE_DIRECT);
+		if (!gfx_command.command_queue()) return failed_init();
+
+		if (!(shaders::initialize() && gpass::initialize() && fx::initialize()))
+			return failed_init();
+
+		NAME_D3D12_OBJECT(main_device, L"Main D3D12 Device");
+		NAME_D3D12_OBJECT(rtv_descriptor_heap.heap(), L"RTV descriptor heap");
+		NAME_D3D12_OBJECT(dsv_descriptor_heap.heap(), L"DSV descriptor heap");
+		NAME_D3D12_OBJECT(srv_descriptor_heap.heap(), L"SRV descriptor heap");
+		NAME_D3D12_OBJECT(uav_descriptor_heap.heap(), L"UAV descriptor heap");
+
 		return true;
 	}
 
@@ -329,12 +338,28 @@ namespace primal::graphics::d3d12::core
 			process_deferred_releases(i);
 		}
 
+		fx::shutdown();
+		shaders::shutdown();
+		gpass::shutdown();
+
+		for (u32 i{ 0 }; i < frame_buffer_count; ++i)
+		{
+			rtv_descriptor_heap.process_deferred_free(i);
+			dsv_descriptor_heap.process_deferred_free(i);
+			srv_descriptor_heap.process_deferred_free(i);
+			uav_descriptor_heap.process_deferred_free(i);
+		}
+
 		rtv_descriptor_heap.release();
 		dsv_descriptor_heap.release();
 		srv_descriptor_heap.release();
 		uav_descriptor_heap.release();
 
-		process_deferred_releases(0);
+		for (u32 i{ 0 }; i < frame_buffer_count; ++i)
+		{
+			process_deferred_releases(i);
+		}
+
 #ifdef _DEBUG
 		{
 			{
@@ -358,17 +383,7 @@ namespace primal::graphics::d3d12::core
 		release(main_device);
 	}
 
-	DXGI_FORMAT render_target_format
-	{
-		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB
-	};
-
-	DXGI_FORMAT default_render_target_format()
-	{
-		return render_target_format;
-	}
-
-	ID3D12Device* const device()
+	id3d12_device* const device()
 	{
 		return main_device;
 	}
@@ -406,7 +421,7 @@ namespace primal::graphics::d3d12::core
 	surface create_surface(platform::window window)
 	{
 		surface_id id{ surfaces.add(window) };
-		surfaces[id].create_swap_chain(dxgi_factory, gfx_command.command_queue(), default_render_target_format());
+		surfaces[id].create_swap_chain(dxgi_factory, gfx_command.command_queue());
 		return surface{ id };
 	}
 
@@ -435,7 +450,7 @@ namespace primal::graphics::d3d12::core
 	void render_surface(surface_id id)
 	{
 		gfx_command.begin_frame();
-		ID3D12GraphicsCommandList* cmd_list{ gfx_command.command_list() };
+		id3d12_graphics_command_list* cmd_list{ gfx_command.command_list() };
 		const u32 frame_index{ current_frame_index() };
 		if (deferred_releases_flag[frame_index])
 		{
@@ -443,8 +458,48 @@ namespace primal::graphics::d3d12::core
 		}
 
 		const d3d12_surface& surface{ surfaces[id] };
-		surface.present();
-		gfx_command.end_frame();
+		ID3D12Resource* const current_back_buffer{ surface.back_buffer()};
+
+		d3d12_frame_info frame_info{
+			surface.width(),
+			surface.height()
+		};
+		gpass::set_size({ frame_info.surface_width, frame_info.surface_height});
+		d3dx::d3d12_resource_barier& barriers{ resource_barriers };
+
+		//record commands
+		ID3D12DescriptorHeap* const heaps[]{ srv_descriptor_heap.heap() };
+		cmd_list->SetDescriptorHeaps(1, &heaps[0]);
+
+		cmd_list->RSSetViewports(1, &surface.viewport());
+		cmd_list->RSSetScissorRects(1, &surface.scissor_rect());
+
+		//depth prepass
+		gpass::add_transitions_for_depth_prepass(barriers);
+		barriers.apply(cmd_list);
+		gpass::set_render_targets_for_depth_prepass(cmd_list);
+		gpass::depth_prepass(cmd_list, frame_info);
+
+
+		//geometry and lighting pass
+		gpass::add_transitions_for_gpass(barriers);
+		barriers.apply(cmd_list);
+		gpass::set_render_targets_for_gpass(cmd_list);
+		gpass::render(cmd_list, frame_info);
+
+		d3dx::transition_resource(cmd_list, current_back_buffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+
+		//post process
+		gpass::add_transitions_for_post_process(barriers);
+		barriers.apply(cmd_list);
+
+		fx::post_process(cmd_list, surface.rtv());
+
+		//after post process
+		d3dx::transition_resource(cmd_list, current_back_buffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+
+		gfx_command.end_frame(surface);
 	}
 
 }

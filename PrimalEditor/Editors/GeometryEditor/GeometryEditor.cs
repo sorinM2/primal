@@ -265,7 +265,7 @@ namespace PrimalEditor.Editors
             }
         }
 
-        private MeshRenderer _meshRenderer;
+        private MeshRenderer _meshRenderer = null;
         public MeshRenderer MeshRenderer
         {
             get => _meshRenderer;

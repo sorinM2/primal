@@ -59,12 +59,12 @@ namespace primal::utl
 			return _size;
 		}
 
-		const u32 capacity() const
+		constexpr u32 capacity() const
 		{
 			return _array.size();
 		}
 
-		const u32 empty() const
+		constexpr bool empty() const
 		{
 			return _size == 0;
 		}

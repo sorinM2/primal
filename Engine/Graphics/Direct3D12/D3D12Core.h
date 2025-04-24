@@ -3,7 +3,11 @@
 
 namespace primal::graphics::d3d12
 {
-	class descriptor_heap;
+	struct d3d12_frame_info
+	{
+		u32 surface_width{};
+		u32 surface_height{};
+	};
 }
 namespace primal::graphics::d3d12::core
 {
@@ -35,13 +39,12 @@ namespace primal::graphics::d3d12::core
 		}
 	}
 
-	ID3D12Device* const device();
+	id3d12_device* const device();
 
 	descriptor_heap& rtv_heap();
 	descriptor_heap& dsv_heap();
 	descriptor_heap& srv_heap();
 	descriptor_heap& uav_heap();
-	DXGI_FORMAT default_render_target_format();
 	u32 current_frame_index();
 	void set_deferred_releases_flag();
 

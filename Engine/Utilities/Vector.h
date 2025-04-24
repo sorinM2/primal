@@ -19,21 +19,13 @@ namespace primal::utl
 			resize(count, value);
 		}
 
-		template<typename it, typename = std::enable_if_t<std::_Is_iterator_v<it>>>
-		constexpr explicit vector(it first, it last)
-		{
-			for (; first != last; ++first)
-			{
-				emplace_back(*first);
-			}
-		}
 
 		constexpr vector(const vector& o) 
 		{
 			*this = o;
 		}
 
-		constexpr vector(const vector&& o)
+		constexpr vector(/*const*/ vector&& o)
 			: _capacity{o._capacity}, _size{o._size}, _data{o._data}
 		{
 			o.reset();
@@ -67,6 +59,7 @@ namespace primal::utl
 			return *this;
 		}
 
+
 		~vector() { destroy(); }
 
 		constexpr void push_back(const T& value)
@@ -94,7 +87,7 @@ namespace primal::utl
 
 		constexpr void resize(u64 new_size)
 		{
-			static_assert(std::is_default_constructible_v<T>, "Type must be default-constructable");
+			static_assert(std::is_default_constructible<T>::value, "Type must be default-constructable");
 
 			if (new_size > _size)
 			{
@@ -110,12 +103,14 @@ namespace primal::utl
 				{
 					destruct_range(new_size, _size);
 				}
+
+				_size = new_size;
 			}
 		}
 
 		constexpr void resize(u64 new_size, const T& value)
 		{
-			static_assert(std::is_copy_constructible_v<T>, "Type must be default-constructable");
+			static_assert(std::is_copy_constructible<T>::value, "Type must be default-constructable");
 
 			if (new_size > _size)
 			{
@@ -131,6 +126,7 @@ namespace primal::utl
 				{
 					destruct_range(new_size, _size);
 				}
+				_size = new_size;
 			}
 		}
 
@@ -156,10 +152,10 @@ namespace primal::utl
 
 		}
 
-		constexpr T* const erase(T* const item)
+		constexpr T* const erase(T* const item) 
 		{
-			assert(_data && item > std::addressof(_data[0]) &&
-				item < std::addressof(data[_size]));
+			assert(_data && item >= std::addressof(_data[0]) &&
+				item < std::addressof(_data[_size]));
 
 			if constexpr (destruct) item->~T();
 			--_size;
@@ -181,11 +177,11 @@ namespace primal::utl
 
 		constexpr void swap(vector& o)
 		{
-			if ( this == std::addressof(o) )
+			if ( this != std::addressof(o) )
 			{ 
-				auto temp{ o };
-				o = *this;
-				*this = temp;
+				auto temp{ std::move(o) };
+				o.move(*this);
+				move(temp);
 			}
 		}
 		constexpr T* const erase_unordered(u64 index)
@@ -271,25 +267,25 @@ namespace primal::utl
 
 		[[nodiscard]] constexpr T* begin()
 		{
-			assert(_data && _size);
+			//assert(_data && _size);
 			return std::addressof(_data[0]);
 		}
 
 		[[nodiscard]] constexpr const  T* begin() const
 		{
-			assert(_data && _size);
+			//assert(_data && _size);
 			return std::addressof(_data[0]);
 		}
 
 		[[nodiscard]] constexpr T* end()
 		{
-			assert(_data && _size);
+			//assert(_data && _size);
 			return std::addressof(_data[_size]);
 		}
 
 		[[nodiscard]] constexpr const T* end() const
 		{
-			assert(_data && _size);
+			//assert(_data && _size);
 			return std::addressof(_data[_size]);
 		}
 	private:
@@ -298,7 +294,7 @@ namespace primal::utl
 			_capacity = o._capacity;
 			_size = o._size;
 			_data = o._data;
-			o.reset;
+			o.reset();
 		}
 
 		constexpr void reset()

@@ -5,6 +5,11 @@ namespace primal::graphics
 {
 	namespace
 	{
+		constexpr const char* engine_shaders_paths[]{
+			".\\shaders\\d3d12\\shaders.bin",
+			// vulkan
+		};
+
 		platform_interface gfx{};
 	}
 
@@ -18,6 +23,7 @@ namespace primal::graphics
 		default:
 			return false;
 		}
+		assert(gfx.platform == platform);
 		return true;
 	}
 
@@ -28,9 +34,18 @@ namespace primal::graphics
 
 	void shutdown()
 	{
-		gfx.shutdown();
+		if ( gfx.platform != (graphics_platform) - 1) gfx.shutdown();
 	}
 
+	const char* get_engine_shaders_path()
+	{
+		return engine_shaders_paths[(u32)gfx.platform];
+	}
+
+	const char* get_engine_shaders_path(graphics_platform platform)
+	{
+		return engine_shaders_paths[(u32)platform];
+	}
 
 	surface create_surface(platform::window window)
 	{
